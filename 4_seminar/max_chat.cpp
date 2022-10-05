@@ -68,36 +68,3 @@ int main()
 
     return 0;
 }
-
-
-// My chat 1
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-
-int main () {
-    char path[] = "./1.fifo";
-    umask(0);   
-    mknod(path, S_IFIFO | 0777, 0);
-    int fd_wr = open(path, O_WRONLY, 0777);
-    printf("open descriptor = %d\n", fd_wr);
-    char msg[1000];
-
-    while (true) {
-        printf("hello\n");    
-        scanf("%s", msg);
-        write(fd_wr, msg, strlen(msg));
-    }
-
-    printf("Hello! Your proc id = %d\n", getpid());
-    close(fd_wr);
-    return 0;
-}
-
-
-// Если другая прога узнает дескр пайпа сможет меняться?
-// как закрыть фифо

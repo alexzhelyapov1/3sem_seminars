@@ -1,35 +1,34 @@
-#include <stdio.h>
-#include <stdlib.h>
+// ####################################################################################################################
+// # Okay, just look at this! I parsed the fork_fifo.cpp to two files (first and second user) and it doesn't work.    #
+// # At the same time, fork_fifo.cpp is work successfully.                                                            #
+// # I tryed really hard, even ask for your help. So, I'll realise chat in shared memory. Fifo is too bad.            #
+// ####################################################################################################################
+
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
-int main () {
-    const char* path2 = "./1.fifo";
-    umask(0);
-    // printf("%d", mkfifo(path2, 0777));
-    int fd_rd = open(path2, O_RDONLY | 0777);
-    char msg[1000];
-    printf("Started\n");
-    int i = 1;
-    while (i--) {
+int main() {
+    int fd, result;
+    size_t size;
+    char resstring[14]; 
+    char name[] = "aaa.fifo";
 
-        int i = 0;
-        int res = 0;
-        res = read(fd_rd, msg, 5);
-        printf("Res of reading number = %d, fd_rf = %d\n", res, fd_rd);
-        msg[6] = '\0';
-        // while ((read(fd_rd, msg + i, 1)) > 1) {
-        //     printf("Try to read from file\n");
-        //     printf("%c", msg[i]);
-        //     i++;
-        // }
-        // msg[i] = '\0';
-        printf("%s", msg);
-    }
+    (void)umask(0);
+    if ((fd = open(name, O_RDONLY)) < 0) {
+            printf("Can\'t open FIFO for reading\n");
+            return(-1);
+    } 
+    size = read(fd, resstring, 14);
+    if (size < 0) {
+        printf("Can\'t read string\n"); 
+        return(-1); 
+    } 
+    printf("%s\n",resstring);
+    close(fd);
 
-    printf("Hello! Your proc id = %d\n", getpid());
     return 0;
 }

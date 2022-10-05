@@ -1,49 +1,43 @@
-/*****************************************************************************
- Excerpt from "Linux Programmer's Guide - Chapter 6"
- (C)opyright 1994-1995, Scott Burkett
- ***************************************************************************** 
- MODULE: pipe.c
- *****************************************************************************/
+// ####################################################################################################################
+// # Okay, just look at this! I parsed the fork_fifo.cpp into two files (first and second user) and it doesn't work.    #
+// # At the same time, fork_fifo.cpp is work successfully.                                                            #
+// # I tryed really hard, even ask for your help. So, I'll realise chat in shared memory. Fifo is too bad.            #
+// ####################################################################################################################
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
-int main(void)
-{
-        int     fd[2], nbytes;
-        pid_t   childpid;
-        char    string[] = "Hello, world!\n";
-        char    readbuffer[80];
+int main() {
+    int fd, result;
+    size_t size;
+    char resstring[14]; 
+    char name[] = "aaa.fifo";
 
-        pipe(fd);
+    (void)umask(0); 
+    if (mknod(name, S_IFIFO | 0666, 0) < 0) {
+	    printf("Can\'t create FIFO\n");
+	    return(-1); 
+    } 
 
-        if((childpid = fork()) == -1)
-        {
-                perror("fork");
-                exit(1);
-        }
+    if ((fd = open(name, O_WRONLY)) < 0) {
+            printf("Can\'t open FIFO for writting\n");
+            return(-1); 
+    }
+    size = write(fd, "Hello, world!", 14);
 
-        if(childpid == 0)
-        {
-                /* Child process closes up input side of pipe */
-                close(fd[0]);
+    // ERROR. This text should be printed, but it does not!
+    // ----------------------------------------------------
+    printf("The text is written\n");
+    // ----------------------------------------------------
+    if (size != 14) {
+        printf("Can\'t write all string to FIFO\n"); 
+        return(-1); 
+    } 
+    // while(1);
+    close(fd);
 
-                /* Send "string" through the output side of pipe */
-                write(fd[1], string, (strlen(string)+1));
-                exit(0);
-        }
-        else
-        {
-                /* Parent process closes up output side of pipe */
-                close(fd[1]);
-
-                /* Read in a string from the pipe */
-                nbytes = read(fd[0], readbuffer, sizeof(readbuffer));
-                printf("Received string: %s", readbuffer);
-        }
-
-        return(0);
+    return 0;
 }
