@@ -20,9 +20,10 @@ int main() {
     number_of_threads++;
 
     pthread_t thread = 777;
-    if (pthread_create(&thread, NULL, my_func, NULL))
+    if (pthread_create(&thread, NULL, my_func, NULL)) {
         printf("Error! Thread did not create\n");
-    pthread_join(thread, NULL);
+        pthread_join(thread, NULL);
+    }
     printf("Sum number of threads = %d\n", number_of_threads);
     return 0;
 }

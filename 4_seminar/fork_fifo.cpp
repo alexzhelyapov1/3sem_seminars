@@ -1,9 +1,3 @@
-// ####################################################################################################################
-// # Hello Max! I took your code as a base for my programm, because every of my near 10 tryes (wich are really just   #
-// # duplicating main strings of create fifo) DOES'N WORK!!!! I don't understand why)                                 #
-// # P.s. Also I took working code from my classmate, and it doesn't work too... (in my WSL and in my Ubuntu)         #
-// ####################################################################################################################
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

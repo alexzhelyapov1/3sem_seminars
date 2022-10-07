@@ -21,8 +21,8 @@ int main() {
 
     pthread_t thread = 777;
     for (int i = 0; i < 5; i++) {
-    if (pthread_create(&thread, NULL, my_func, NULL))
-        printf("Error! Thread did not create\n");
+        if (pthread_create(&thread, NULL, my_func, NULL))
+            printf("Error! Thread did not create\n");
         pthread_join(thread, NULL);
         printf("Threads synchronized\n");
     }

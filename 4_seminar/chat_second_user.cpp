@@ -1,7 +1,5 @@
 // ####################################################################################################################
-// # Okay, just look at this! I parsed the fork_fifo.cpp to two files (first and second user) and it doesn't work.    #
-// # At the same time, fork_fifo.cpp is work successfully.                                                            #
-// # I tryed really hard, even ask for your help. So, I'll realise chat in shared memory. Fifo is too bad.            #
+// Reading text
 // ####################################################################################################################
 
 
@@ -14,7 +12,7 @@
 int main() {
     int fd, result;
     size_t size;
-    char resstring[14]; 
+    char msg[1000]; 
     char name[] = "aaa.fifo";
 
     (void)umask(0);
@@ -22,12 +20,13 @@ int main() {
             printf("Can\'t open FIFO for reading\n");
             return(-1);
     } 
-    size = read(fd, resstring, 14);
-    if (size < 0) {
-        printf("Can\'t read string\n"); 
-        return(-1); 
-    } 
-    printf("%s\n",resstring);
+    while (1) {
+        size = read(fd, msg, 1000);
+        if (size > 0) {
+            msg[size] = '\0';
+            printf("%s\n", msg);
+        } 
+    }
     close(fd);
 
     return 0;

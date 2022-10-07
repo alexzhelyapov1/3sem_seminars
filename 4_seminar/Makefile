@@ -1,26 +1,26 @@
-all: global
+all: clean prepare
 
-1:
-	touch 1.out 1.fifo
-	rm 1.out *fifo
-	g++ chat_first_user.cpp -o ./1.out
-	./1.out
+.PHONY: prepare clean
 
-2:
-	# touch 2.out 1.fifo
-	# rm 2.out *fifo
-	g++ chat_second_user.cpp -o ./2.out
-	./2.out
+chat_first_user: prepare chat_first_user.cpp
+	g++ chat_first_user.cpp -pthread -o ./build/chat_first_user.out
+	./build/chat_first_user.out
 
-new:
-	# touch new.out 1.fifo
-	# rm new.out *fifo
-	g++ new_chat.cpp -o ./new.out
-	./new.out
+chat_second_user: prepare chat_second_user.cpp
+	g++ chat_second_user.cpp -pthread -o ./build/chat_second_user.out
+	./build/chat_second_user.out
+	
+fork_fifo: prepare fork_fifo.cpp
+	g++ fork_fifo.cpp -pthread -o ./build/fork_fifo.out
+	./build/fork_fifo.out
+create_fifo: prepare create_fifo.cpp
+	g++ create_fifo.cpp -pthread -o ./build/create_fifo.out
+	./build/create_fifo.out
 
+prepare:
+	mkdir -p build
 
-global:
-	touch 2.out 1.fifo
-	rm 2.out *fifo
-	g++ chat_second_user.cpp -o ./2.out
-	./2.out
+clean:
+	rm -rf build
+	touch aaa.fifo
+	rm aaa.fifo
