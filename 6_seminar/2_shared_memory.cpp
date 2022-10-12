@@ -4,18 +4,10 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <pthread.h>
-#include <unistd.h>
-
-void *my_func(void *arg) {
-    printf("I am new thread = %ld\n", pthread_self());
-    sleep(1);
-    return NULL;
-}
 
 
 int main() {
-    const char* path = "~/Desktop/root/infa/3sem_seminars/6_seminar/1_shared_memory.cpp";
+    const char* path = "~/Desktop/root/infa/3sem_seminars/5_seminar/1_shared_memory.cpp";
     umask(0);
     int* mem;
     int key = ftok(path, 0);
@@ -34,25 +26,8 @@ int main() {
 
     mem[1] += 1;
     mem[2] += 1;
-    mem[4] += 1;
-    mem[5] += 1;
-
-    printf("I am first thread = %ld\n", pthread_self());
-    pthread_t thread[10];
-    for (int i = 0; i < 5; i++) {
-        if (pthread_create(thread + i, NULL, my_func, NULL)) {
-            printf("Error! Thread did not create\n");
-        }
-        else {
-            mem[4]++;
-            mem[5]++;
-        }
-    }
-    for (int i = 0; i < 5; i++) {
-        pthread_join(thread[i], NULL);
-        printf("Thread %ld synchronized\n", thread[i]);
-    }
-    
+    mem[4]++;
+    mem[5]++;
     for (int i = 0; i < 6; i++) {
         printf("%d ", mem[i]);
     }

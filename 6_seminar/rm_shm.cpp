@@ -7,19 +7,18 @@
 
 
 int main() {
-    const char* path = "~/Desktop/root/infa/3sem_seminars/6_seminar/1_shared_memory.cpp";
+    const char* path = "~/Desktop/root/infa/3sem_seminars/5_seminar/1_shared_memory.cpp";
     umask(0);
     int* mem;
     int key = ftok(path, 0);
-    printf("Ftok = %d\n", key);
-    int descriptor = shmget(key, sizeof(int) * 6, 0666 | IPC_CREAT | IPC_EXCL);
+    int descriptor = shmget(key, sizeof(int) * 3, 0666 | IPC_CREAT | IPC_EXCL);
 
     if (descriptor < 0) {
         printf("Memory exists\n");
-        descriptor = shmget(key, sizeof(int) * 6, 0);
+        descriptor = shmget(key, sizeof(int) * 3, 0);
         mem = (int*) shmat(descriptor, NULL, 0);
-        shmdt(mem);
         shmctl(descriptor, IPC_RMID, NULL);
+        shmdt(mem);
     }
     return 0;
 }
