@@ -14,11 +14,10 @@ int main() {
     int descriptor = shmget(key, sizeof(int) * 3, 0666 | IPC_CREAT | IPC_EXCL);
 
     if (descriptor < 0) {
-        printf("Memory exists\n");
+        printf("Memory exists. Deleting...\n");
         descriptor = shmget(key, sizeof(int) * 3, 0);
-        mem = (int*) shmat(descriptor, NULL, 0);
         shmctl(descriptor, IPC_RMID, NULL);
-        shmdt(mem);
+        printf("Deleted successfully!\n");
     }
     return 0;
 }
