@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <string.h>
 
-const int size_of_bufer = 1000;
+const int size_of_bufer = 2000;
 
 
 void OpenSharedMemory(const char* path, char** mem_ret, int* descriptor_ret);
