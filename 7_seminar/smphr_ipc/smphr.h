@@ -8,13 +8,12 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sem.h>
+
 
 const int size_of_bufer = 1;
 // extern S;
 
-int* open_shm(const char* path);
-void close_shm(int* mem);
-void probieren(int* S);
-void verhogen(int* S);
+int open_sem(const char* path);
 
 #endif
