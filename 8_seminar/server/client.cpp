@@ -1,6 +1,6 @@
 #include "msg.h"
 
-// type = 1 - new client
+// type = 1 - new client or msg to another user
 //      = 2 - get my id
 //      = 3 - new user added, update list
 
@@ -17,7 +17,7 @@ int get_descryptor() {
 int new_client(int descryptor) {
     struct msg_struct m = {};
     m.type = 1;
-    strcpy(m.data, "Hello world\n");
+    strcpy(m.data, "New user");
     if (msgsnd(descryptor, &m, sizeof(struct msg_struct) - sizeof(long), 0) < 0)
         printf("Not sended\n");
 
@@ -57,13 +57,45 @@ void receive_msg(int descryptor, int my_id, int* clients_list) {
                 clients_list[i] = new_list[i];
             }
             clients_list[i] = -1;
+            printf("Last = %d, i = %d\n", clients_list[i], i);
             printf ("New clients list received!!!\n");
             print_list(clients_list);
         }
+
+        else if (strcmp(m.data, "msg") == 0) {
+            printf("Received msg from user %d:\n", m.to);
+            printf("%s\n", m.data + size_of_info);
+        }
+
     }
 
     else
         printf("Cant receive msg\n");
+}
+
+void send_msg(int descryptor, int my_id) {
+    struct msg_struct m;
+    m.type = 1;
+    m.from = my_id;
+    strcpy(m.data, "msg");
+
+
+    printf("Please, enter the id of receiver, and msg (exaple: '100 hello'):");
+    scanf("%d", &(m.to));
+    int i = size_of_info;
+    char c = getchar();
+    while ((c = getchar()) != '\n') {
+        m.data[i] = c;
+        i++;
+    }
+    m.data[i] = '\0';
+
+
+    if (msgsnd(descryptor, &m, sizeof(struct msg_struct) - sizeof(long), 0) < 0)
+        printf("Not sended\n");
+
+    else 
+        printf("Sended! Msg: %s\n", m.data + size_of_info);
 }
 
 
@@ -77,15 +109,17 @@ int main() {
 
     char s[100];
     while (true) {
+        printf("Please, enter the command (r/s/l): ");
         if (scanf("%s", s) > 0) {
-            if (strcpy(s, "r"))
+            if (!strcmp(s, "r")) {
                 receive_msg(descryptor, my_id, clients_list);
+            }
 
-            else if (strcpy(s, "s")) {
-                // send_msg(descryptor, my_id);
+            else if (!strcmp(s, "s")) {
+                send_msg(descryptor, my_id);
             }
             
-            else if (strcpy(s, "l")) {
+            else if (!strcmp(s, "l")) {
                 print_list(clients_list);
             }
         }

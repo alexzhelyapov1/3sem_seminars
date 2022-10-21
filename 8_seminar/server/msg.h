@@ -9,8 +9,8 @@
 #include <string.h>
 #include <time.h>
 
-// const char* path = "/home/alexey_zhelyapov/Desktop/root/infa/3sem_seminars/8_seminar/msg.h";
-const char* path = "/home/leksey2/3sem_seminars/8_seminar/msg.h";
+const char* path = "/home/alexey_zhelyapov/Desktop/root/infa/3sem_seminars/8_seminar/msg.h";
+// const char* path = "/home/leksey2/3sem_seminars/8_seminar/msg.h";
 
 struct msg_struct {
     long type;
