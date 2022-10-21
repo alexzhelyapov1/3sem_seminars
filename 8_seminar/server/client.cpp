@@ -9,7 +9,7 @@ int get_descryptor() {
     if (!(key = ftok(path, 0))) printf("Error in ftok, key = %d\n", key);
 
     int descryptor = msgget(key, 0666 | IPC_CREAT);
-    if (descryptor < 0) printf("Error descryptor = %d", descryptor);
+    if (descryptor < 0) printf("Error descryptor = %d\n", descryptor);
     return descryptor;
 }
 
@@ -37,7 +37,34 @@ int new_client(int descryptor) {
         return -1;
 }
 
+void print_list (int* list) {
+    for (int i = 0; list[i] != -1; i++)
+        printf("%d ", list[i]);
+    printf("\n");
+}
 
+void receive_msg(int descryptor, int my_id, int* clients_list) {
+    struct msg_struct m;
+
+    if (msgrcv(descryptor, &m, sizeof(struct msg_struct) - sizeof(long), my_id, 0) >= 0) {
+        printf("Msg received:\n");
+        printf("%s", m.data);
+
+        if (strcmp(m.data, "New clients") == 0) {
+            int* new_list = (int*) (m.data + size_of_info);
+            int i = 0;
+            for (i = 0; new_list[i] != -1; i++) {
+                clients_list[i] = new_list[i];
+            }
+            clients_list[i] = -1;
+            printf ("New clients list received!!!\n");
+            print_list(clients_list);
+        }
+    }
+
+    else
+        printf("Cant receive msg\n");
+}
 
 
 
@@ -46,6 +73,21 @@ int main() {
     int my_id = new_client(descryptor);
     int clients_list[100] = {};
     clients_list[0] = -1;
+    // receive_msg(descryptor, my_id, clients_list);
 
-    
+    char s[100];
+    while (true) {
+        if (scanf("%s", s) > 0) {
+            if (strcpy(s, "r"))
+                receive_msg(descryptor, my_id, clients_list);
+
+            else if (strcpy(s, "s")) {
+                // send_msg(descryptor, my_id);
+            }
+            
+            else if (strcpy(s, "l")) {
+                print_list(clients_list);
+            }
+        }
+    }
 }
