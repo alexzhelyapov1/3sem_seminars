@@ -29,7 +29,9 @@ int main() {
     close(fd);
 
     // Check file
-    system("cat 1.txt");
+
+    char* args[] = {{(char*)"cat"}, {(char*)"1.txt"}, NULL};
+    execvp("cat", args);
 
     return 0;
 }
