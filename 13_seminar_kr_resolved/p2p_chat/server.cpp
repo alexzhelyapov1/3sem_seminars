@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
 
 struct client_info{
     in_addr addr;
@@ -23,15 +24,29 @@ void print_clients_list(client_info* clients_list, int number_of_clients) {
     printf("End of list*\n\n");
 }
 
+int sendall(int s, char* buf, int len, int flags) {
+    int total = 0;
+    int n;
+
+    while (total < len) {
+        n = send(s, buf + total, len - total, flags);
+        if (n == -1) {break;}
+        total += n;
+    }
+
+    return (n == -1 ? -1 : total);
+}
+
 void mailing_new_clients_list(client_info* clients_list, int number_of_clients) {
-    int size_of_msg = 1000 * sizeof(client_info);
+    int size_of_msg = 1100;
     // New socket for old clients
-    int old_client_socket = socket(AF_INET, SOCK_STREAM, 0);
     for (int i = 0; i < number_of_clients; i++) {
+        int old_client_socket = socket(AF_INET, SOCK_STREAM, 0);
         // Client address
         struct sockaddr_in old_client_addr = {0};
         old_client_addr.sin_family = AF_INET;
-        old_client_addr.sin_port = clients_list[i].port;
+        old_client_addr.sin_addr = clients_list[i].addr;
+        old_client_addr.sin_port = htons(60000 + i);
 
         int connection_old_client = connect(old_client_socket, (struct sockaddr *) &old_client_addr, sizeof(old_client_addr));
         if (connection_old_client < 0) {
@@ -39,17 +54,21 @@ void mailing_new_clients_list(client_info* clients_list, int number_of_clients) 
             printf("Client #%d, IP = %s, port = %hu\n\n", i, inet_ntoa(clients_list[i].addr), clients_list[i].port);
             continue;
         }
-        send(old_client_socket, (const void*) clients_list, size_of_msg, 0);
+        printf("Sended to client #%d, IP = %s, port = %hu\n\n", i, inet_ntoa(clients_list[i].addr), clients_list[i].port);
+        char msg[1100];
+        memcpy(msg + 100, clients_list, 1000);
+        msg[0] = 1;
+        sendall(old_client_socket, (char*) msg, size_of_msg, 0);
+        close(old_client_socket);
     }
 }
-
 
 int main(int argc, char* argv[]){
     char welcome_msg_to_client[] = "Hello from server!\n";
     char msg_from_client[1000] = {};
     client_info clients_list[1000];
     
-    int number_of_clients = 5;
+    int number_of_clients = 0;
 
     // Socket
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -80,15 +99,15 @@ int main(int argc, char* argv[]){
         recv(client_socket, &msg_from_client, sizeof(msg_from_client), 0);
         printf("Received msg from clien:\n%s\n", msg_from_client);
 
-        send(client_socket, &welcome_msg_to_client, sizeof(welcome_msg_to_client), 0);  // Send welcome
-        int sended = send(client_socket, (const void*) &number_of_clients, sizeof(number_of_clients), 0);  // Send id
+        sendall(client_socket, welcome_msg_to_client, sizeof(welcome_msg_to_client), 0);  // Send welcome
+        int sended = sendall(client_socket, (char*) &number_of_clients, sizeof(number_of_clients), 0);  // Send id
         printf("Sended = %d bytes\n", sended);
 
         clients_list[number_of_clients].addr = new_client_addr.sin_addr;
         clients_list[number_of_clients].port = new_client_addr.sin_port;
         number_of_clients += 1;
 
-        //mailing_new_clients_list(clients_list, number_of_clients);
+        mailing_new_clients_list(clients_list, number_of_clients);
         print_clients_list(clients_list, number_of_clients);
         close(client_socket);
         printf("--------------------\n");
